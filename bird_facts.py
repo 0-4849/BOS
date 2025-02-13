@@ -10,7 +10,8 @@ species = res["Common_Name"].drop_duplicates()
 
 def find_commonest_food(data: pd.DataFrame, species: str) -> (str, int):
     entries = data.loc[data["Common_Name"] == species]
-    total_items = entries["Item_Sample_Size"]
+    total_items = entries["Item_Sample_Size"].sum()
+    print(total_items)
     food_frequency = entries["Prey_Class"].value_counts()
     return (food_frequency.index[0], food_frequency.iloc[0])
 
