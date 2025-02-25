@@ -2,17 +2,21 @@ import pyreadr
 import pandas as pd
 
 print("parsing data")
-res = pyreadr.read_r("dietdb.rda")["dietdb"]
-print(f"Table columns: {res.keys()}")
-species = res["Common_Name"].drop_duplicates()
+data = pyreadr.read_r("dietdb.rda")["dietdb"]
+print(f"Table columns: {data.keys()}")
+species = data["Common_Name"].drop_duplicates()
 # print(species)
 # print(res.loc[res["Common_Name"] == species[0]])
 
-def find_commonest_food(data: pd.DataFrame, species: str) -> (str, int):
-    entries = data.loc[data["Common_Name"] == species]
+def find_commonest_food(species: str, *args, group_by="Prey_Class") -> (str, int):
+    global data
+    entries = data.loc[(data["Common_Name"] == species) & (data["Diet_Type"] == "Items")]
     total_items = entries["Item_Sample_Size"].sum()
-    print(total_items)
-    food_frequency = entries["Prey_Class"].value_counts()
-    return (food_frequency.index[0], food_frequency.iloc[0])
+    food_frequency = entries.groupby(group_by).sum()["Item_Sample_Size"]
+    print(food_frequency)
+    return (food_frequency.max(), food_frequency.idxmax())
 
-print(find_commonest_food(res, "Bald Eagle"))
+print(find_commonest_food("Bald Eagle"))
+
+# print(data[data["Diet_Type"] == "Items"].iloc[1])
+print(data[data["Common_Name"] == "Bald Eagle"].groupby("Diet_Type").sum())
