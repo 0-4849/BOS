@@ -42,7 +42,9 @@ def find_commonest_food(species: str, *args, group_by="Prey_Class") -> (str, np.
     return (food_frequency.idxmax(), food_frequency.max() / total_items)
 
 def make_card(card: Card, template_path: str = "./trivia_card_template.svg"):
-    pass
+    svg_tree = etree.parse(template_path)
+    print(svg_tree)
+    
 
 
 if __name__ == "__main__":
@@ -59,6 +61,9 @@ if __name__ == "__main__":
             incorrect_answers = prey_classes[prey_classes != commonest_food].to_list()
             card = Card(f"What does the {s} eat the most?", incorrect_answers, commonest_food) 
             print(card)
+            make_card(card)
+            
+      
             
         break
 
