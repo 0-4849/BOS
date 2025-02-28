@@ -4,16 +4,18 @@ import pandas as pd
 import pyreadr
 
 class Card:
-    def __init__(self, question: str, incorrect_answers: pd.Series, correct_answer: str, shown_answers: int = 4):
+    def __init__(self, question: str, incorrect_answers: list[str], correct_answer: str, total_answers_shown: int = 4):
         self.question = question
         self.incorrect_answers = incorrect_answers
         self.correct_answer = correct_answer 
-        self.shown_answers = shown_answers
+        self.total_answers_shown = total_answers_shown
 
     def __str__(self):
-        return self.question 
-            + "\n" 
-            + "\n".join([f"{l}: {a}" for l, a in zip("ABCDEFGHIJKLMNOPQRSTUVWXYZ", random.sample(self.incorrect_answers + [self.correct_answer], self.shown_answers))])
+        answers = random.sample(self.incorrect_answers, self.total_answers_shown - 1)
+        answers.append(self.correct_answer)
+        random.shuffle(answers)
+        return self.question + "\n" + "\n".join([f"{l}: {a}" 
+            for l, a in zip("ABCDEFGHIJKLMNOPQRSTUVWXYZ", answers)]) + f"\n correct answer: {self.correct_answer}"
         
 
 def find_commonest_food(species: str, *args, group_by="Prey_Class") -> (str, np.float64):
