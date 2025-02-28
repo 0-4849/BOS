@@ -1,4 +1,5 @@
 import random
+from lxml import etree
 import numpy as np
 import pandas as pd
 import pyreadr
@@ -40,19 +41,25 @@ def find_commonest_food(species: str, *args, group_by="Prey_Class") -> (str, np.
 
     return (food_frequency.idxmax(), food_frequency.max() / total_items)
 
+def make_card(card: Card, template_path: str = "./trivia_card_template.svg"):
+    pass
+
 
 if __name__ == "__main__":
-    print("parsing data...")
+    print("parsing bird data...")
     data = pyreadr.read_r("dietdb.rda")["dietdb"]
 
     species = data["Common_Name"].drop_duplicates()
     prey_classes = data["Prey_Class"].drop_duplicates()
 
+    # generate questions of type "What does [species] eat the most?"
     for s in species:
         if (x := find_commonest_food(s)) is not None:	
             commonest_food, normalized_frequency = x 
             incorrect_answers = prey_classes[prey_classes != commonest_food].to_list()
-            card = Card(f"What does the {s} eat?", incorrect_answers, commonest_food) 
+            card = Card(f"What does the {s} eat the most?", incorrect_answers, commonest_food) 
             print(card)
+            
+        break
 
 
