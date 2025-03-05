@@ -5,7 +5,8 @@ import pandas as pd
 import pyreadr
 
 class Card:
-    def __init__(self, question: str, incorrect_answers: list[str], correct_answer: str, total_answers_shown: int = 4):
+    def __init__(self, id_: int, question: str, incorrect_answers: list[str], correct_answer: str, total_answers_shown: int = 4):
+        self.id_ = id_
         self.question = question
         self.incorrect_answers = incorrect_answers
         self.correct_answer = correct_answer 
@@ -13,7 +14,7 @@ class Card:
 
     def __str__(self):
         answers = self.get_answers()
-        return self.question + "\n" + "\n".join([f"{l}: {a}" 
+        return self.question + "\n" + "\n".join([f"{self.id_}. {l}: {a}" 
             for l, a in zip("ABCDEFGHIJKLMNOPQRSTUVWXYZ", answers)]) + f"\n correct answer: {self.correct_answer}"
 
     def get_answers(self, amount: int = 4):
@@ -35,7 +36,7 @@ class Card:
 #            final_string += word
         
 
-def find_commonest_food(species: str, *args, group_by="Prey_Class") -> (str, np.float64):
+def find_commonest_food(species: str, *_args, group_by="Prey_Class") -> (str, np.float64):
     global data
     entries = data.loc[(data["Common_Name"] == species) & (data["Diet_Type"] == "Items")]
 	
@@ -58,7 +59,7 @@ def find_commonest_food(species: str, *args, group_by="Prey_Class") -> (str, np.
     return (food_frequency.idxmax(), food_frequency.max() / total_items)
 
 
-def make_card(card: Card, template_path: str = "./trivia_card_template.svg") -> str:
+def make_card(card: Card, template_path: str = "./trivia_card_template.svg") -> (int, str):
     svg_tree = etree.parse(template_path)
     root = svg_tree.getroot()
     q  = root[3]
@@ -70,11 +71,11 @@ def make_card(card: Card, template_path: str = "./trivia_card_template.svg") -> 
     answers = list(zip("ABCDEFGHIJKLMNOPQRSTUVWXYZ", card.get_answers()))
     correct_letter = next(x[0] for x in answers if x[1] == card.correct_answer)
     
-    q.text = card.question
+    q.text = f"{str(card.id_)}. {card.question}"
     [a1.text, a2.text, a3.text, a4.text] = list(map(lambda x: f"{x[0]}: {x[1]}", answers))
     etree.ElementTree(root).write(card.question, pretty_print=True)
 
-    return correct_letter
+    return (card.id_, correct_letter)
 
 
 if __name__ == "__main__":
@@ -89,8 +90,10 @@ if __name__ == "__main__":
         if (x := find_commonest_food(s)) is not None:	
             commonest_food, normalized_frequency = x 
             incorrect_answers = prey_classes[prey_classes != commonest_food].to_list()
-            card = Card(f"{i}. What does the {s} eat the most?", incorrect_answers, commonest_food) 
-            print(make_card(card))
-        break
+            card = Card(i + 1, f"What does the {s} eat the most?", incorrect_answers, commonest_food) 
+            q_number, answer = make_card(card)
+            print(f"{q_number}: {answer}")
+        if i > 3: 
+            break
 
 
