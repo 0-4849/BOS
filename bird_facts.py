@@ -157,7 +157,6 @@ if __name__ == "__main__":
     # there are some entries where the class is either an emtpy string or NaN
     # we drop those
     prey_classes = data["Prey_Class"].drop_duplicates().replace("", float("nan")).dropna()
-    print(prey_classes)
 
     # generate questions of type "What does [species] eat the most?"
     i = 1
