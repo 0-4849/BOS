@@ -154,16 +154,21 @@ if __name__ == "__main__":
     data = pyreadr.read_r("dietdb.rda")["dietdb"]
 
     species = data["Common_Name"].drop_duplicates()
-    prey_classes = data["Prey_Class"].drop_duplicates()
-    print(prey_classes.to_string())
-else:
+    # there are some entries where the class is either an emtpy string or NaN
+    # we drop those
+    prey_classes = data["Prey_Class"].drop_duplicates().replace("", float("nan")).dropna()
+    print(prey_classes)
 
     # generate questions of type "What does [species] eat the most?"
     i = 1
     for s in species:
         if (x := find_commonest_food(s)) is not None:	
-            commonest_food, normalized_frequency = x 
-            incorrect_answers = prey_classes[prey_classes != commonest_food].to_list()
+            commonest_food_class, normalized_frequency = x 
+            incorrect_class_answers = prey_classes[prey_classes != commonest_food_class].to_list()
+
+            commonest_food = class_common_name[commonest_food_class]
+            incorrect_answers = [class_common_name[c] for c in incorrect_class_answers]
+
             card = Card(i, s, incorrect_answers, commonest_food) 
             q_number, answer = make_card(card)
             print(f"{q_number}: {answer}")
