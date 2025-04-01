@@ -82,12 +82,52 @@ def make_card(card: Card, template_path: str = "./trivia_card_template.svg", sav
 
 
 if __name__ == "__main__":
+    class_common_name = {
+        "Teleostei": "Ray-finned fish",
+        "Aves": "Birds",
+        "Mammalia": "Mammals",
+        "Chondrichthyes": "Cartilaginous fish",
+        "Reptilia": "Reptiles",
+        "Malacostraca": "Crabs, shrimp, etc.",
+        "Bivalvia": "Clams, mussels, etc.",
+        "Insecta": "Insects",
+        "Amphibia": "Amphibians",
+        "Chromadorea": "Roundworms",
+        "Cephalopoda": "Octopuses, squids, etc.",
+        "Echinoidea": "Sea urchins",
+        "Chondrostei": "Ray-finned fish",
+        "": "",
+        "": "",
+        "": "",
+        "": "",
+        "": "",
+        "": "",
+        "": "",
+        "": "",
+        "": "",
+        "": "",
+        "": "",
+        "": "",
+        "": "",
+        "": "",
+        "": "",
+        "": "",
+        "": "",
+        "": "",
+        "": "",
+        "": "",
+        "": "",
+    }
+
+    
     random.seed(10)
     print("parsing bird data...")
     data = pyreadr.read_r("dietdb.rda")["dietdb"]
 
     species = data["Common_Name"].drop_duplicates()
     prey_classes = data["Prey_Class"].drop_duplicates()
+    print(prey_classes.to_string())
+else:
 
     # generate questions of type "What does [species] eat the most?"
     i = 1
