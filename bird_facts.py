@@ -76,7 +76,7 @@ def make_card(card: Card, template_path: str = "./trivia_card_template.svg", sav
     answers = list(zip("ABCDEFGHIJKLMNOPQRSTUVWXYZ", card.get_answers()))
     correct_letter = next(x[0] for x in answers if x[1] == card.correct_answer)
     
-    q.text = f"{str(card.id_)}. What does {card.question}"
+    q.text = f"{str(card.id_)}. What does the {card.question}"
     q2.text = "eat the most?"
     [a1.text, a2.text, a3.text, a4.text] = list(map(lambda x: f"{x[0]}. {x[1]}", answers))
     if output_png:
