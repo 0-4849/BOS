@@ -4,6 +4,7 @@ import numpy as np
 import pandas as pd
 import pyreadr
 from cairosvg import svg2png
+from PIL import Image
 
 class Card:
     def __init__(self, id_: int, question: str, incorrect_answers: list[str], correct_answer: str, total_answers_shown: int = 4):
@@ -60,7 +61,7 @@ def find_commonest_food(species: str, *_args, group_by="Prey_Class") -> (str, np
     return (food_frequency.idxmax(), food_frequency.max() / total_items)
 
 
-def make_card(card: Card, template_path: str = "./trivia_card_template.svg", save_path: str = "trivia/", output_png=False) -> (int, str):
+def make_card(card: Card, save_path: str, template_path: str = "./trivia_card_template.svg", output_png=False) -> (int, str):
     svg_tree = etree.parse(template_path)
     root = svg_tree.getroot()
     q  = root[3]
@@ -71,8 +72,6 @@ def make_card(card: Card, template_path: str = "./trivia_card_template.svg", sav
     a3 = root[7]
     a4 = root[8]
 
-    path = save_path + str(card.id_) + ".png"
-
     answers = list(zip("ABCDEFGHIJKLMNOPQRSTUVWXYZ", card.get_answers()))
     correct_letter = next(x[0] for x in answers if x[1] == card.correct_answer)
     
@@ -80,13 +79,25 @@ def make_card(card: Card, template_path: str = "./trivia_card_template.svg", sav
     q2.text = "eat the most?"
     [a1.text, a2.text, a3.text, a4.text] = list(map(lambda x: f"{x[0]}. {x[1]}", answers))
     if output_png:
-        svg2png(bytestring=etree.tostring(root),write_to=path)
+        svg2png(bytestring=etree.tostring(root),write_to=save_path)
     else:
-        etree.ElementTree(root).write(save_path + str(card.id_), pretty_print=True)
+        etree.ElementTree(root).write(save_path, pretty_print=True)
         
-
     return (card.id_, correct_letter)
 
+
+def addRandomOverlayPNG(source_path: str, overlay_paths=["overlay1.png", "overlay2.png", "overlay3.png"]):
+    bg = Image.open(source_path)
+    overlay = Image.open(random.choice(overlay_paths))
+
+    bg = bg.convert("RGBA")
+    overlay = overlay.convert("RGBA")
+
+    stripped_source_path = source_path.replace(".png", "")
+    # overlayed_img = Image.blend(bg, overlay, 1.0)
+    bg.paste(overlay, mask=overlay)
+    bg.save(stripped_source_path + "_overlayed.png")
+    
 
 if __name__ == "__main__":
     class_common_name = {
@@ -176,7 +187,10 @@ if __name__ == "__main__":
             incorrect_answers = [class_common_name[c] for c in incorrect_class_answers]
 
             card = Card(i, s, incorrect_answers, commonest_food) 
-            q_number, answer = make_card(card, output_png=True, template_path="./trivia_card_template_white.svg")
+            save_path = "trivia/" + str(card.id_) + ".png"
+
+            q_number, answer = make_card(card, save_path, output_png=True, template_path="./trivia_card_template_white.svg")
+            addRandomOverlayPNG(save_path)
             print(f"{q_number}: {answer}")
             i += 1
 
