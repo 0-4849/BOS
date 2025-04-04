@@ -86,17 +86,15 @@ def make_card(card: Card, save_path: str, template_path: str = "./trivia_card_te
     return (card.id_, correct_letter)
 
 
-def addRandomOverlayPNG(source_path: str, overlay_paths=["overlay1.png", "overlay2.png", "overlay3.png"]):
+def addRandomOverlayPNG(source_path: str, save_path: str, overlay_paths=["template_images/overlay1.png", "template_images/overlay2.png", "template_images/overlay3.png"]):
     bg = Image.open(source_path)
     overlay = Image.open(random.choice(overlay_paths))
 
     bg = bg.convert("RGBA")
     overlay = overlay.convert("RGBA")
 
-    stripped_source_path = source_path.replace(".png", "")
-    # overlayed_img = Image.blend(bg, overlay, 1.0)
     bg.paste(overlay, mask=overlay)
-    bg.save(stripped_source_path + "_overlayed.png")
+    bg.save(save_path)
     
 
 if __name__ == "__main__":
@@ -187,10 +185,11 @@ if __name__ == "__main__":
             incorrect_answers = [class_common_name[c] for c in incorrect_class_answers]
 
             card = Card(i, s, incorrect_answers, commonest_food) 
-            save_path = "trivia/" + str(card.id_) + ".png"
+            save_path = "trivia/png_not_overlayed/" + str(card.id_) + ".png"
+            save_path_overlayed = "trivia/png_overlayed/" + str(card.id_) + ".png"
 
-            q_number, answer = make_card(card, save_path, output_png=True, template_path="./trivia_card_template_white.svg")
-            addRandomOverlayPNG(save_path)
+            q_number, answer = make_card(card, save_path, output_png=True, template_path="template_images/trivia_card_template_white.svg")
+            addRandomOverlayPNG(save_path, save_path_overlayed)
             print(f"{q_number}: {answer}")
             i += 1
 
